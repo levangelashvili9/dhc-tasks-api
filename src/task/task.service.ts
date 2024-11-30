@@ -34,9 +34,9 @@ export class TaskService {
         }
       : {};
 
-    if (status === TaskStatus.Completed) {
+    if (status === TaskStatus.COMPLETED) {
       searchFilter.isCompleted = true;
-    } else if (status === TaskStatus.Pending) {
+    } else if (status === TaskStatus.PENDING) {
       searchFilter.isCompleted = false;
     }
 
@@ -85,9 +85,9 @@ export class TaskService {
 
     const statusFilter: Prisma.TaskWhereInput = {};
 
-    if (status === TaskStatus.Completed) {
+    if (status === TaskStatus.COMPLETED) {
       statusFilter.isCompleted = true;
-    } else if (status === TaskStatus.Pending) {
+    } else if (status === TaskStatus.PENDING) {
       statusFilter.isCompleted = false;
     }
 

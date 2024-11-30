@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -36,13 +37,13 @@ export class TaskController {
   }
 
   @Delete(':id')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id') id: string) {
     return this.taskService.delete(+id);
   }
 
   @Delete()
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async clearAll(@Query() clearAllDto: ClearAllDto) {
     await this.taskService.clearAll(clearAllDto);
   }
