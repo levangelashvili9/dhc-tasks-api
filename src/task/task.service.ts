@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common';
+
+import { TaskStatus } from './enums/task-status.enum';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { Prisma } from '@prisma/client';
 import { GetTasksDto } from './dto/get-tasks.dto';
-import { TaskStatus } from './enums/task-status.enum';
 import { ClearAllDto } from './dto/clear-all.dto';
 
 @Injectable()
@@ -60,6 +61,8 @@ export class TaskService {
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
+    await this.findOne(id);
+
     return this.prisma.task.update({
       where: { id },
       data: {
@@ -70,6 +73,8 @@ export class TaskService {
   }
 
   async delete(id: number) {
+    await this.findOne(id);
+
     return this.prisma.task.delete({
       where: { id },
     });
@@ -92,9 +97,21 @@ export class TaskService {
   }
 
   async markAsCompleted(id: number) {
+    await this.findOne(id);
+
     return this.prisma.task.update({
       where: { id },
       data: { isCompleted: true },
     });
+  }
+
+  private async findOne(id: number) {
+    const task = await this.prisma.task.findUnique({ where: { id } });
+
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+
+    return task;
   }
 }
