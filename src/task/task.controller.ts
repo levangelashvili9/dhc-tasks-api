@@ -12,7 +12,8 @@ import {
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { GetTasksDto } from './dto/get-tasks.dto';
+import { ClearAllDto } from './dto/clear-all.dto';
 
 @Controller('task')
 export class TaskController {
@@ -24,8 +25,8 @@ export class TaskController {
   }
 
   @Get()
-  findAll(@Query() paginationQuery: PaginationQueryDto) {
-    return this.taskService.findAll(paginationQuery);
+  findAll(@Query() getTasksDto: GetTasksDto) {
+    return this.taskService.findAll(getTasksDto);
   }
 
   @Patch(':id')
@@ -41,8 +42,8 @@ export class TaskController {
 
   @Delete()
   @HttpCode(204)
-  async clearAll() {
-    await this.taskService.clearAll();
+  async clearAll(@Query() clearAllDto: ClearAllDto) {
+    await this.taskService.clearAll(clearAllDto);
   }
 
   @Patch(':id/complete')

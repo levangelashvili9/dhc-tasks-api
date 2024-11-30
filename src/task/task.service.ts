@@ -3,7 +3,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Prisma } from '@prisma/client';
-import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { GetTasksDto } from './dto/get-tasks.dto';
+import { TaskStatus } from './enums/task-status.enum';
+import { ClearAllDto } from './dto/clear-all.dto';
 
 @Injectable()
 export class TaskService {
@@ -19,8 +21,8 @@ export class TaskService {
     });
   }
 
-  async findAll(paginationQuery: PaginationQueryDto) {
-    const { page, limit, search } = paginationQuery;
+  async findAll(getTasksDto: GetTasksDto) {
+    const { page, limit, search, status } = getTasksDto;
 
     const searchFilter: Prisma.TaskWhereInput = search
       ? {
@@ -30,6 +32,12 @@ export class TaskService {
           ],
         }
       : {};
+
+    if (status === TaskStatus.Completed) {
+      searchFilter.isCompleted = true;
+    } else if (status === TaskStatus.Pending) {
+      searchFilter.isCompleted = false;
+    }
 
     const currentPage = page || 1;
     const resourcePerPage = limit || 10;
@@ -46,7 +54,9 @@ export class TaskService {
 
     const totalPages = Math.ceil(totalCount / resourcePerPage);
 
-    return { data, currentPage, totalCount, totalPages };
+    const reversedData = data.reverse();
+
+    return { data: reversedData, currentPage, totalCount, totalPages };
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
@@ -65,8 +75,20 @@ export class TaskService {
     });
   }
 
-  async clearAll() {
-    return this.prisma.task.deleteMany();
+  async clearAll(clearAllDto?: ClearAllDto) {
+    const { status } = clearAllDto;
+
+    const statusFilter: Prisma.TaskWhereInput = {};
+
+    if (status === TaskStatus.Completed) {
+      statusFilter.isCompleted = true;
+    } else if (status === TaskStatus.Pending) {
+      statusFilter.isCompleted = false;
+    }
+
+    return this.prisma.task.deleteMany({
+      where: statusFilter,
+    });
   }
 
   async markAsCompleted(id: number) {
