@@ -22,7 +22,7 @@ async function bootstrap() {
 
   const options = new DocumentBuilder()
     .setTitle('DHC Task')
-    .setDescription('DHC Task')
+    .setDescription('Api documentation for DHC Task')
     .setVersion('1.0')
     .build();
 
